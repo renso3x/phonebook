@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Phonebook</title>
+	<style>
+		table, th, td {
+			border: 1px solid black;
+			border-collapse: collapse;
+		}
+		th, td {
+			padding: 5px;
+			text-align: left;
+		}
+	</style>
+</head>
+<body>
+	<h1>Phonebook Directory</h1>
+	<form method="POST" id="contactForm">
+		<label>Firstname: </label><input type="text" id="firstname">
+		<label>Lastname: </label><input type="text" id="lastname">
+		<label>Contact No: </label><input type="text" id="contactno">
+		<input type="submit" id="submit" value="Add Contact">
+	</form>
+	<br>
+	<table style="width: 100%">
+		<tr>
+			<th>First Name</th>
+			<th>Last Name</th>
+			<th>Contact No</th>
+		</tr>
+		<tbody class="tableBody"></tbody>
+	</table>
+
+	<script type="text/javascript" src="/static/jquery-1.12.4.min.js"></script>
+	<script type="text/javascript">
+		var $contactForm = $('#contactForm');
+		var tableBody = $('.tableBody:last');
+
+		var getContacts = function() {
+			$.get('/api/contacts', function(data) {
+				var fetchContact = data;
+
+				$.each(fetchContact, function(key, val) {
+					console.log(val);
+
+					var appendBody = '<td>' + val.firstname + '</td>' +
+									'<td>' + val.lastname + '</td>' +
+									'<td>' + val.contactno + '</td>';
+					tableBody.append('<tr>' + appendBody + '</tr>');
+				});
+			});
+		}
+
+		getContacts();
+
+		$contactForm.submit(function(e) {
+			e.preventDefault();
+
+			var newContact = {};
+			newContact.firstname = $contactForm.find('input[id="firstname"]').val();
+			newContact.lastname = $contactForm.find('input[id="lastname"]').val();
+			newContact.contactno = $contactForm.find('input[id="contactno"]').val();
+
+			$.post('/api/contacts', newContact, function(data) {
+				var fetchContact = data.contacts;
+				var appendBody = '<td>' + fetchContact.firstname + '</td>' +
+								'<td>' + fetchContact.lastname + '</td>' +
+								'<td>' + fetchContact.contactno + '</td>';
+				tableBody.append('<tr>' + appendBody + '</tr>');
+			});
+		});
+	</script>
+</body>
+</html>
